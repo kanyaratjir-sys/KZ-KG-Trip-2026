@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>🌲 KZ+KG Trip 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<style>
+:root {
+  --bg: #0d1a0a;
+  --bg2: #132010;
+  --bg3: #1d2e1a;
+  --card: #172214;
+  --card2: #1f2d1c;
+  --border: #2c3e28;
+  --accent: #5c9e6e;
+  --accent2: #90d4a0;
+  --accent-glow: rgba(92,158,110,0.22);
+  --green: #6dbf82;
+  --red: #f87171;
+  --orange: #fb923c;
+  --yellow: #fbbf24;
+  --text: #dff0d8;
+  --text2: #8aaa82;
+  --text3: #546e4c;
+  --radius: 16px;
+  --radius-sm: 10px;
+  --nav-h: 88px;
+}
+* { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+html,body { height:100%; background:var(--bg); color:var(--text); font-family:'Sarabun',sans-serif; font-size:15px; }
+body { display:flex; flex-direction:column; overflow:hidden; }
+#app { flex:1; overflow:hidden; display:flex; flex-direction:column; }
+.page { display:none; flex:1; overflow-y:auto; padding-bottom:calc(var(--nav-h) + 8px); }
+.page.active { display:block; }
+
+/* TOP BAR */
+.top-bar {
+  background:rgba(13,26,10,.9); border-bottom:1px solid var(--border);
+  padding:14px 16px 10px; display:flex; align-items:center; justify-content:space-between;
+  position:sticky; top:0; z-index:100; backdrop-filter:blur(12px);
+}
+.top-bar h1 { font-size:18px; font-weight:700; }
+.top-bar .sub { font-size:12px; color:var(--text3); }
+
+/* LIQUID GLASS NAVBAR */
+.bottom-nav {
+  position:fixed; bottom:14px; left:50%; transform:translateX(-50%);
+  width:calc(100% - 28px); max-width:460px; height:62px;
+  background:rgba(10,20,8,.72);
+  backdrop-filter:blur(28px) saturate(180%);
+  -webkit-backdrop-filter:blur(28px) saturate(180%);
+  border-radius:31px;
+  border:1px solid rgba(144,212,160,.18);
+  box-shadow:0 12px 40px rgba(0,0,0,.55),0 2px 8px rgba(0,0,0,.3),
+    inset 0 1px 0 rgba(255,255,255,.07),inset 0 -1px 0 rgba(0,0,0,.2);
+  display:flex; align-items:center; padding:4px 6px; z-index:200;
+}
+.nav-btn {
+  flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:2px; cursor:pointer; border:none; background:none; color:var(--text3);
+  font-family:'Sarabun',sans-serif; font-size:10px; padding:7px 4px; border-radius:24px;
+  transition:all .3s cubic-bezier(.34,1.56,.64,1);
+}
+.nav-btn .ni { font-size:20px; display:block; line-height:1; transition:transform .3s cubic-bezier(.34,1.56,.64,1); }
+.nav-btn.active { color:var(--accent2); background:rgba(92,158,110,.28); }
+.nav-btn.active .ni { transform:scale(1.22) translateY(-1px); }
+
+/* FAB */
+.fab {
+  position:fixed; bottom:calc(14px + 62px + 12px); right:16px; z-index:150;
+  width:52px; height:52px; border-radius:50%;
+  background:linear-gradient(135deg,var(--accent),#3d7a53);
+  border:none; cursor:pointer; color:#fff; font-size:26px;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 4px 20px var(--accent-glow); transition:transform .15s;
+}
+.fab:active { transform:scale(.92); }
+
+/* SECTIONS */
+.section { padding:16px; }
+.section+.section { padding-top:0; }
+.sec-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+.sec-header h2 { font-size:16px; font-weight:700; }
+.add-btn { padding:5px 12px; border-radius:20px; font-size:13px; font-family:'Sarabun',sans-serif; background:var(--accent-glow); border:1px solid var(--accent); color:var(--accent2); cursor:pointer; }
+
+/* HOME HERO — FOREST */
+.home-hero {
+  background:linear-gradient(175deg,#061204 0%,#102808 45%,#193315 100%);
+  padding:30px 20px 24px; position:relative; overflow:hidden; min-height:200px;
+}
+.home-hero::before {
+  content:''; position:absolute; inset:0;
+  background:radial-gradient(ellipse at 78% 18%,rgba(92,158,110,.18) 0%,transparent 60%),
+    radial-gradient(ellipse at 12% 88%,rgba(45,90,35,.22) 0%,transparent 50%);
+  z-index:0; pointer-events:none;
+}
+.hero-leaf { position:absolute; opacity:.055; z-index:0; pointer-events:none; user-select:none; }
+.hero-leaf-1 { font-size:110px; right:-18px; top:-12px; transform:rotate(12deg); }
+.hero-leaf-2 { font-size:78px; left:-12px; bottom:-16px; transform:rotate(-18deg); }
+.trip-label { font-size:11px; color:var(--accent2); letter-spacing:2px; text-transform:uppercase; margin-bottom:6px; position:relative; z-index:1; }
+.trip-title { font-size:30px; font-weight:800; color:#e8f5e0; letter-spacing:-.5px; position:relative; z-index:1; text-shadow:0 2px 12px rgba(0,0,0,.4); }
+.trip-dates { font-size:13px; color:var(--text2); margin:4px 0 16px; position:relative; z-index:1; }
+
+/* COUNTDOWN */
+.countdown {
+  display:inline-flex; align-items:center; gap:6px; padding:10px 16px; border-radius:24px;
+  background:rgba(92,158,110,.15); border:1px solid rgba(92,158,110,.4);
+  position:relative; z-index:1; backdrop-filter:blur(8px); flex-wrap:wrap;
+}
+.cd-unit { display:flex; flex-direction:column; align-items:center; gap:1px; }
+.cd-num { font-size:22px; font-weight:800; color:var(--accent2); line-height:1; min-width:28px; text-align:center; }
+.cd-lbl { font-size:8px; color:var(--text3); text-transform:uppercase; letter-spacing:.5px; }
+.cd-sep { font-size:16px; font-weight:700; color:var(--accent); margin-bottom:10px; opacity:.7; }
+.countdown.on-trip { background:rgba(74,222,128,.12); border-color:var(--green); }
+.countdown.on-trip .cd-num { color:var(--green); }
+.countdown.done { background:rgba(251,191,36,.12); border-color:var(--yellow); }
+.countdown.done .cd-num { color:var(--yellow); }
+
+/* FIREBASE BADGE */
+.fb-badge {
+  display:inline-flex; align-items:center; gap:5px; padding:5px 10px; border-radius:14px;
+  font-size:11px; cursor:pointer; margin-top:8px; z-index:1; position:relative;
+  font-family:'Sarabun',sans-serif; border:none; background:none;
+}
+.fb-badge.connected { background:rgba(74,222,128,.12); border:1px solid rgba(74,222,128,.3); color:var(--green); }
+.fb-badge.disconnected { background:rgba(248,113,113,.1); border:1px solid rgba(248,113,113,.25); color:var(--red); }
+.fb-dot { width:6px; height:6px; border-radius:50%; background:currentColor; display:inline-block; }
+
+/* MEMBERS */
+.members-scroll { display:flex; gap:12px; overflow-x:auto; padding-bottom:4px; }
+.members-scroll::-webkit-scrollbar { display:none; }
+.member-card { display:flex; flex-direction:column; align-items:center; gap:5px; min-width:68px; cursor:pointer; }
+.member-avatar { width:58px; height:58px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:26px; overflow:hidden; transition:transform .15s; }
+.member-card:active .member-avatar { transform:scale(.93); }
+.member-name { font-size:12px; color:var(--text2); text-align:center; white-space:nowrap; max-width:72px; overflow:hidden; text-overflow:ellipsis; }
+.member-me-tag { font-size:9px; color:var(--accent2); background:var(--accent-glow); padding:1px 6px; border-radius:8px; border:1px solid rgba(144,212,160,.3); }
+
+/* NOTES */
+.note-card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius-sm); margin-bottom:8px; overflow:hidden; }
+.note-header { display:flex; align-items:center; justify-content:space-between; padding:12px 14px; cursor:pointer; }
+.note-title { font-size:14px; font-weight:600; flex:1; }
+.note-actions { display:flex; align-items:center; gap:6px; }
+.icon-btn { background:none; border:none; cursor:pointer; font-size:16px; padding:2px; }
+.note-chev { color:var(--text3); font-size:12px; margin-left:4px; }
+.note-body { padding:10px 14px 12px; font-size:13px; color:var(--text2); line-height:1.7; border-top:1px solid var(--border); }
+
+/* PREPARE */
+.prep-tabs { display:flex; gap:8px; margin-bottom:12px; }
+.tab-btn { flex:1; padding:9px; border-radius:var(--radius-sm); font-size:13px; font-family:'Sarabun',sans-serif; cursor:pointer; background:var(--bg3); border:1px solid var(--border); color:var(--text2); transition:all .2s; }
+.tab-btn.active { background:var(--accent-glow); border-color:var(--accent); color:var(--accent2); font-weight:600; }
+.prep-panel { display:none; }
+.prep-panel.active { display:block; }
+.prep-card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius-sm); overflow:hidden; margin-bottom:8px; }
+.cost-row { display:flex; align-items:flex-start; justify-content:space-between; padding:11px 14px; border-bottom:1px solid var(--border); }
+.cost-row:last-of-type { border-bottom:none; }
+.cost-item { font-size:13px; color:var(--text2); flex:1; padding-right:8px; line-height:1.4; }
+.cost-detail { display:flex; flex-direction:column; align-items:flex-end; gap:3px; }
+.cost-amount { font-size:13px; color:var(--text); font-weight:600; white-space:nowrap; }
+.prep-see-more { width:100%; padding:10px; text-align:center; font-size:13px; font-family:'Sarabun',sans-serif; cursor:pointer; background:var(--bg3); border:none; border-top:1px solid var(--border); color:var(--accent2); }
+.costs-total { display:flex; justify-content:space-between; align-items:center; padding:12px 14px; margin-top:0; background:linear-gradient(135deg,var(--accent-glow),transparent); border:1px solid var(--accent); border-radius:var(--radius-sm); }
+.total-amount { font-size:18px; font-weight:800; color:var(--accent2); }
+.cost-note { font-size:11px; color:var(--text3); margin-top:8px; line-height:1.5; }
+.dress-row { padding:11px 14px; border-bottom:1px solid var(--border); }
+.dress-row:last-of-type { border-bottom:none; }
+.dress-city { font-size:14px; font-weight:600; display:flex; justify-content:space-between; margin-bottom:4px; }
+.dress-temp { font-size:12px; color:var(--accent2); }
+.dress-code { font-size:13px; color:var(--text2); line-height:1.5; }
+
+/* RATES */
+.rates-grid { display:flex; flex-direction:column; gap:8px; }
+.rate-item { display:flex; align-items:center; gap:8px; background:var(--bg3); padding:10px 14px; border-radius:var(--radius-sm); border:1px solid var(--border); }
+.rate-item label { font-size:13px; color:var(--text2); width:60px; }
+.rate-item input { flex:1; background:transparent; border:none; color:var(--accent2); font-size:15px; font-weight:600; font-family:'Sarabun',sans-serif; min-width:0; }
+.rate-item input:focus { outline:none; }
+
+/* ALMATY BANNER */
+.almaty-banner { margin:8px 16px 20px; border-radius:var(--radius); overflow:hidden; position:relative; height:155px; border:1px solid var(--border); }
+.almaty-banner img { width:100%; height:100%; object-fit:cover; display:block; }
+.almaty-banner-ov { position:absolute; inset:0; background:linear-gradient(to top,rgba(0,0,0,.65) 0%,rgba(0,0,0,.1) 60%); display:flex; flex-direction:column; justify-content:flex-end; padding:12px 14px; }
+.almaty-banner-title { color:#fff; font-size:14px; font-weight:700; text-shadow:0 1px 6px rgba(0,0,0,.6); }
+.almaty-banner-sub { color:rgba(255,255,255,.7); font-size:11px; margin-top:2px; }
+
+/* ITINERARY */
+.day-card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); margin:0 16px 12px; overflow:hidden; }
+.day-header { display:flex; align-items:flex-start; justify-content:space-between; padding:14px 16px; cursor:pointer; gap:8px; }
+.day-info { display:flex; align-items:flex-start; gap:10px; flex:1; min-width:0; }
+.day-flag { font-size:24px; flex-shrink:0; }
+.day-num { font-size:11px; color:var(--text3); margin-bottom:2px; }
+.day-title { font-size:15px; font-weight:700; }
+.day-loc { font-size:12px; color:var(--text2); margin-top:2px; }
+.day-wx { display:flex; flex-direction:column; align-items:flex-end; gap:2px; flex-shrink:0; }
+.w-icon { font-size:20px; }
+.w-temp { font-size:12px; color:var(--accent2); font-weight:600; white-space:nowrap; }
+.day-chev { font-size:11px; color:var(--text3); }
+.day-body { border-top:1px solid var(--border); padding:14px 16px; }
+.wx-detail { font-size:12px; color:var(--text2); margin-bottom:10px; padding:8px 12px; background:var(--bg3); border-radius:8px; }
+.hotel-info { display:flex; justify-content:space-between; align-items:center; padding:8px 12px; margin-bottom:14px; background:rgba(92,158,110,.08); border:1px solid rgba(92,158,110,.2); border-radius:8px; font-size:13px; gap:8px; flex-wrap:wrap; }
+.hotel-cost { display:flex; align-items:center; gap:6px; }
+.hst { font-size:11px; padding:2px 7px; border-radius:10px; font-weight:600; }
+.hst.paid { background:rgba(74,222,128,.15); color:var(--green); }
+.hst.unpaid { background:rgba(248,113,113,.15); color:var(--red); }
+.hst.todo { background:rgba(251,191,36,.15); color:var(--yellow); }
+.events-list { display:flex; flex-direction:column; gap:14px; }
+.event-item { display:flex; gap:10px; }
+.event-time { font-size:11px; color:var(--text3); white-space:nowrap; min-width:44px; padding-top:2px; }
+.event-content { flex:1; min-width:0; }
+.event-name { font-size:14px; font-weight:600; margin-bottom:3px; }
+.event-desc { font-size:12px; color:var(--text2); line-height:1.5; margin-bottom:8px; }
+.event-maps { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px; }
+.map-link { display:inline-flex; align-items:center; gap:4px; padding:5px 10px; border-radius:20px; font-size:12px; text-decoration:none; }
+.map-link.gmap { background:rgba(66,133,244,.15); color:#4285f4; border:1px solid rgba(66,133,244,.3); }
+.map-link.mme { background:rgba(92,158,110,.12); color:var(--accent2); border:1px solid rgba(92,158,110,.3); }
+.photo-scroll { display:flex; gap:8px; overflow-x:auto; padding-bottom:4px; }
+.photo-scroll::-webkit-scrollbar { display:none; }
+.ev-photo { width:120px; height:80px; object-fit:cover; border-radius:8px; flex-shrink:0; cursor:pointer; }
+.ph-loading { font-size:12px; color:var(--text3); }
+
+/* EXPENSES */
+.exp-list { padding:0 16px; }
+.expense-item { display:flex; align-items:flex-start; gap:12px; padding:14px; background:var(--card); border:1px solid var(--border); border-radius:var(--radius-sm); margin-bottom:8px; cursor:pointer; transition:background .15s; }
+.expense-item:active { background:var(--card2); }
+.exp-icon { font-size:28px; flex-shrink:0; }
+.exp-info { flex:1; min-width:0; }
+.exp-name { font-size:14px; font-weight:600; }
+.exp-meta { display:flex; align-items:center; gap:8px; margin:2px 0; }
+.exp-date { font-size:12px; color:var(--text3); }
+.exp-payer { font-size:12px; font-weight:600; }
+.exp-splits { font-size:11px; color:var(--text3); }
+.exp-amount { text-align:right; flex-shrink:0; }
+.exp-orig { font-size:15px; font-weight:700; }
+.exp-thb { font-size:12px; color:var(--text3); }
+
+/* SUMMARY */
+.sum-hero { margin:16px; padding:20px; background:linear-gradient(135deg,var(--accent-glow),transparent); border:1px solid var(--accent); border-radius:var(--radius); text-align:center; }
+.sum-hero .tot-lbl { font-size:13px; color:var(--text2); margin-bottom:6px; }
+.sum-hero .tot-val { font-size:32px; font-weight:800; color:var(--accent2); }
+.sum-hero .tot-sub { font-size:13px; color:var(--text3); margin-top:4px; }
+.mscard { display:flex; align-items:center; gap:12px; padding:12px 14px; background:var(--card); border:1px solid var(--border); border-radius:var(--radius-sm); margin-bottom:8px; }
+.ms-av { width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:20px; overflow:hidden; flex-shrink:0; }
+.ms-inf { flex:1; min-width:0; }
+.ms-name { font-size:14px; font-weight:600; }
+.ms-det { font-size:11px; color:var(--text3); margin-top:2px; }
+.ms-bal { font-size:16px; font-weight:800; flex-shrink:0; }
+.ms-bal.pos { color:var(--green); }
+.ms-bal.neg { color:var(--red); }
+.tx-item { display:flex; align-items:center; justify-content:space-between; padding:12px 14px; background:var(--card); border:1px solid var(--border); border-radius:var(--radius-sm); margin-bottom:8px; gap:8px; }
+.tx-from,.tx-to { font-size:14px; font-weight:600; flex:1; }
+.tx-to { text-align:right; }
+.tx-arr { font-size:13px; color:var(--text3); white-space:nowrap; text-align:center; }
+.cat-bar { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+.cat-bar-lbl { font-size:13px; color:var(--text2); width:90px; flex-shrink:0; }
+.cat-bar-wrap { flex:1; background:var(--bg3); border-radius:4px; height:8px; overflow:hidden; }
+.cat-bar-fill { height:100%; border-radius:4px; background:var(--accent); transition:width .5s; }
+.cat-bar-amt { font-size:12px; color:var(--text3); width:72px; text-align:right; flex-shrink:0; }
+
+/* MODAL */
+#modal-ov { display:none; position:fixed; inset:0; z-index:1000; background:rgba(0,0,0,.75); backdrop-filter:blur(4px); align-items:flex-end; justify-content:center; }
+#modal-box { background:var(--bg2); border-top:1px solid var(--border); border-radius:20px 20px 0 0; width:100%; max-width:500px; max-height:90vh; overflow-y:auto; animation:su .25s ease; }
+@keyframes su { from { transform:translateY(100%); } to { transform:translateY(0); } }
+.mhdr { padding:16px 20px 8px; border-bottom:1px solid var(--border); }
+.mhdr h3 { font-size:16px; font-weight:700; }
+.mbdy { padding:16px 20px; display:flex; flex-direction:column; gap:12px; }
+.mbdy label { font-size:13px; color:var(--text2); margin-bottom:-6px; }
+.mbdy input[type=text],.mbdy input[type=number],.mbdy input[type=date],.mbdy select,.mbdy textarea { width:100%; padding:11px 14px; background:var(--bg3); border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--text); font-size:15px; font-family:'Sarabun',sans-serif; }
+.mbdy input:focus,.mbdy select:focus,.mbdy textarea:focus { outline:none; border-color:var(--accent); }
+.mbdy textarea { resize:vertical; min-height:100px; }
+.mftr { display:flex; align-items:center; justify-content:space-between; padding:12px 20px 24px; border-top:1px solid var(--border); gap:8px; }
+.btn-save { padding:12px 24px; background:linear-gradient(135deg,var(--accent),#3d7a53); border:none; border-radius:var(--radius-sm); color:#fff; font-size:15px; font-weight:700; font-family:'Sarabun',sans-serif; cursor:pointer; }
+.btn-cancel { padding:12px 16px; background:var(--bg3); border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--text2); font-size:15px; font-family:'Sarabun',sans-serif; cursor:pointer; }
+.btn-del { padding:12px 16px; background:rgba(248,113,113,.15); border:1px solid rgba(248,113,113,.3); border-radius:var(--radius-sm); color:var(--red); font-size:15px; font-family:'Sarabun',sans-serif; cursor:pointer; }
+
+/* MEMBER EDITOR */
+.emoji-grid { display:flex; flex-wrap:wrap; gap:8px; }
+.emo-opt { font-size:24px; padding:6px; border-radius:10px; cursor:pointer; background:var(--bg3); transition:background .15s; }
+.emo-opt.sel { background:var(--accent-glow); }
+.clr-grid { display:flex; flex-wrap:wrap; gap:10px; }
+.clr-opt { width:32px; height:32px; border-radius:50%; cursor:pointer; border:3px solid transparent; transition:border-color .15s; }
+.clr-opt.sel { border-color:#fff; }
+.mav-lg { width:80px; height:80px; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto; overflow:hidden; }
+.btn-upload { padding:10px 16px; background:var(--bg3); border:1px dashed var(--border); border-radius:var(--radius-sm); color:var(--text2); font-size:13px; font-family:'Sarabun',sans-serif; cursor:pointer; }
+.btn-rmpho { padding:10px 16px; background:rgba(248,113,113,.1); border:1px solid rgba(248,113,113,.2); border-radius:var(--radius-sm); color:var(--red); font-size:13px; font-family:'Sarabun',sans-serif; cursor:pointer; margin-left:8px; }
+.pho-area { display:flex; flex-wrap:wrap; gap:4px; }
+
+/* EXPENSE FORM */
+.cat-chips { display:flex; flex-wrap:wrap; gap:6px; }
+.cat-chip { padding:6px 11px; border-radius:20px; font-size:12px; cursor:pointer; background:var(--bg3); border:1px solid var(--border); color:var(--text2); transition:all .15s; }
+.cat-chip.sel { background:var(--accent-glow); border-color:var(--accent); color:var(--accent2); }
+.amt-row { display:flex; gap:10px; }
+.amt-f { flex:2; display:flex; flex-direction:column; gap:6px; }
+.cur-f { flex:1; display:flex; flex-direction:column; gap:6px; }
+.splt-list { display:flex; flex-direction:column; gap:8px; }
+.sel-all-btn { padding:8px 14px; background:var(--bg3); border:1px solid var(--border); border-radius:var(--radius-sm); font-size:13px; font-family:'Sarabun',sans-serif; color:var(--text2); cursor:pointer; align-self:flex-start; }
+.splt-chk { display:flex; align-items:center; gap:10px; padding:10px 12px; background:var(--bg3); border-radius:var(--radius-sm); border:1px solid var(--border); cursor:pointer; font-size:14px; }
+.splt-chk input { display:none; }
+.splt-chk .chk-av { width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:18px; overflow:hidden; }
+.splt-chk:has(input:checked) { background:var(--accent-glow); border-color:var(--accent); }
+
+/* ONBOARDING */
+#onboarding-ov {
+  display:flex; position:fixed; inset:0; z-index:3000;
+  background:linear-gradient(165deg,#050f03 0%,#0d2208 55%,#162e10 100%);
+  align-items:center; justify-content:center; padding:28px; overflow-y:auto;
+}
+.ob-box { width:100%; max-width:380px; text-align:center; }
+.ob-icon { font-size:60px; display:block; margin-bottom:14px; }
+.ob-title { font-size:26px; font-weight:800; color:#e0f0d8; margin-bottom:8px; }
+.ob-sub { font-size:14px; color:var(--text2); margin-bottom:28px; line-height:1.7; }
+.ob-field { text-align:left; margin-bottom:16px; }
+.ob-field label { font-size:13px; color:var(--text2); display:block; margin-bottom:7px; }
+.ob-field input { width:100%; padding:14px 16px; background:rgba(255,255,255,.06); border:1px solid rgba(144,212,160,.3); border-radius:14px; color:var(--text); font-size:17px; font-family:'Sarabun',sans-serif; text-align:center; }
+.ob-field input:focus { outline:none; border-color:var(--accent2); background:rgba(255,255,255,.09); }
+.ob-emojis { display:flex; justify-content:center; flex-wrap:wrap; gap:8px; }
+.ob-emo { font-size:28px; padding:8px; border-radius:14px; cursor:pointer; background:rgba(255,255,255,.05); border:2px solid transparent; transition:all .2s; }
+.ob-emo.sel { background:rgba(92,158,110,.22); border-color:var(--accent2); transform:scale(1.1); }
+.ob-colors { display:flex; justify-content:center; gap:10px; flex-wrap:wrap; }
+.ob-clr { width:34px; height:34px; border-radius:50%; cursor:pointer; border:3px solid transparent; transition:all .15s; }
+.ob-clr.sel { border-color:#fff; box-shadow:0 0 0 2px rgba(255,255,255,.35); transform:scale(1.1); }
+.btn-ob-save { width:100%; padding:16px; margin-top:24px; background:linear-gradient(135deg,var(--accent),#3d7a53); border:none; border-radius:16px; color:#fff; font-size:16px; font-weight:700; font-family:'Sarabun',sans-serif; cursor:pointer; box-shadow:0 6px 24px rgba(92,158,110,.35); transition:transform .15s; }
+.btn-ob-save:active { transform:scale(.97); }
+
+/* FIREBASE SETUP */
+#fb-setup-ov { display:none; position:fixed; inset:0; z-index:2000; background:rgba(0,0,0,.8); backdrop-filter:blur(6px); align-items:flex-end; justify-content:center; }
+#fb-setup-box { background:var(--bg2); border-top:1px solid var(--border); border-radius:20px 20px 0 0; width:100%; max-width:500px; max-height:92vh; overflow-y:auto; animation:su .25s ease; }
+.fb-step { font-size:13px; color:var(--text2); line-height:1.85; background:var(--bg3); padding:13px 14px; border-radius:var(--radius-sm); margin-bottom:10px; }
+.fb-step b { color:var(--accent2); }
+.fb-step a { color:var(--accent2); }
+
+/* MISC */
+.photo-fs { display:flex; flex-direction:column; align-items:center; padding:20px; cursor:pointer; }
+#toast { position:fixed; bottom:calc(14px + 62px + 14px); left:50%; transform:translateX(-50%) translateY(20px); background:var(--card2); border:1px solid var(--border); color:var(--text); padding:10px 18px; border-radius:20px; font-size:13px; z-index:2500; opacity:0; transition:all .3s; pointer-events:none; white-space:nowrap; max-width:90vw; text-align:center; }
+#toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+.empty-st { text-align:center; padding:40px 20px; color:var(--text3); font-size:14px; line-height:2; }
+.empty-txt { color:var(--text3); font-size:13px; padding:12px 0; }
+</style>
+</head>
+<body>
+
+<!-- ONBOARDING -->
+<div id="onboarding-ov">
+  <div class="ob-box">
+    <span class="ob-icon">🌲</span>
+    <div class="ob-title">ยินดีต้อนรับ!</div>
+    <div class="ob-sub">Kazakhstan & Kyrgyzstan 2026<br>กรอกชื่อเล่นเพื่อเข้าร่วมทริป</div>
+    <div class="ob-field">
+      <label>ชื่อเล่นของคุณ</label>
+      <input type="text" id="ob-name" placeholder="เช่น นุ่น, บอม, ..." autocomplete="off" maxlength="20">
+    </div>
+    <div class="ob-field">
+      <label>เลือก Avatar</label>
+      <div class="ob-emojis" id="ob-emojis"></div>
+    </div>
+    <div class="ob-field">
+      <label>เลือกสีประจำตัว</label>
+      <div class="ob-colors" id="ob-colors"></div>
+    </div>
+    <input type="hidden" id="ob-emo-val" value="🧑">
+    <input type="hidden" id="ob-clr-val" value="#5c9e6e">
+    <button class="btn-ob-save" onclick="saveOnboarding()">เข้าร่วมทริป 🚀</button>
+  </div>
+</div>
+
+<!-- FIREBASE SETUP MODAL -->
+<div id="fb-setup-ov">
+  <div id="fb-setup-box">
+    <div class="mhdr"><h3>🔥 ตั้งค่า Firebase Sync</h3></div>
+    <div class="mbdy">
+      <div class="fb-step">
+        <b>1.</b> ไปที่ <b>console.firebase.google.com</b> → <b>Add project</b><br>
+        <b>2.</b> Build → <b>Realtime Database</b> → Create database → เลือก <b>Singapore</b> → <b>Test mode</b><br>
+        <b>3.</b> กลับไป Project Settings (⚙️) → General → Your apps → กด <b>&lt;/&gt;</b> (Web)<br>
+        <b>4.</b> ตั้งชื่อ app → Register → จะเห็น <b>firebaseConfig</b> → Copy ทั้งหมด<br>
+        <b>5.</b> วาง Config ด้านล่าง แล้วกด "เชื่อมต่อ"
+      </div>
+      <label>วาง firebaseConfig ที่นี่</label>
+      <textarea id="fb-cfg-input" rows="9" placeholder='{&#10;  "apiKey": "AIza...",&#10;  "authDomain": "your-app.firebaseapp.com",&#10;  "databaseURL": "https://your-app-rtdb.asia-southeast1.firebasedatabase.app",&#10;  "projectId": "your-app",&#10;  "storageBucket": "your-app.appspot.com",&#10;  "messagingSenderId": "123456",&#10;  "appId": "1:123456:web:abc123"&#10;}'></textarea>
+      <p style="font-size:12px;color:var(--text3)">⚠️ Test mode ใช้ได้ 30 วัน หลังจากนั้นต้องแก้ Rules ที่ Firebase Console</p>
+    </div>
+    <div class="mftr">
+      <button class="btn-cancel" onclick="closeFbSetup()">ปิด</button>
+      <button class="btn-save" onclick="saveFbConfig()">เชื่อมต่อ Firebase</button>
+    </div>
+  </div>
+</div>
+
+<div id="app">
+  <div class="page active" id="page-home"><div id="home-cnt"></div></div>
+  <div class="page" id="page-itinerary">
+    <div class="top-bar"><div><h1>🗓️ แผนการเดินทาง</h1><div class="sub">22 ก.ค. – 1 ส.ค. 2026 · Plan B</div></div></div>
+    <div style="height:12px"></div>
+    <div id="itin-cnt"></div>
+  </div>
+  <div class="page" id="page-expenses">
+    <div class="top-bar"><div><h1>💸 รายจ่าย</h1><div class="sub" id="exp-sub">0 รายการ</div></div></div>
+    <div style="height:12px"></div>
+    <div id="exp-cnt" class="exp-list"></div>
+  </div>
+  <div class="page" id="page-summary">
+    <div class="top-bar"><div><h1>📊 สรุป</h1><div class="sub">Settlement & Overview</div></div></div>
+    <div id="sum-cnt"></div>
+  </div>
+</div>
+
+<button class="fab" id="fab" style="display:none" onclick="openExpModal(null)">+</button>
+
+<nav class="bottom-nav">
+  <button class="nav-btn active" data-page="home" onclick="goTo('home')"><span class="ni">🏠</span>หน้าแรก</button>
+  <button class="nav-btn" data-page="itinerary" onclick="goTo('itinerary')"><span class="ni">🗺️</span>แผนทริป</button>
+  <button class="nav-btn" data-page="expenses" onclick="goTo('expenses')"><span class="ni">💸</span>รายจ่าย</button>
+  <button class="nav-btn" data-page="summary" onclick="goTo('summary')"><span class="ni">📊</span>สรุป</button>
+</nav>
+
+<div id="modal-ov"><div id="modal-box"></div></div>
+<div id="toast"></div>
+
+<script>
+// SHARE_STATE_PLACEHOLDER
+
+// ================================================================
+// FIREBASE
+// ================================================================
+let fbApp=null,fbDb=null,fbSyncEnabled=false,fbSaveTimer=null,fbLastSaved=0;
+
+function loadFbConfig(){
+  try{const r=localStorage.getItem('kzkg_fb_config');return r?JSON.parse(r):null;}catch(e){return null;}
+}
+function initFirebase(cfg){
+  if(fbApp)return;
+  if(!cfg||!cfg.databaseURL){updateFbBadge(false);return;}
+  try{
+    fbApp=firebase.initializeApp(cfg);
+    fbDb=firebase.database();
+    fbSyncEnabled=true;
+    updateFbBadge(true);
+    fbDb.ref('/kzkg2026/state').on('value',snap=>{
+      if(Date.now()-fbLastSaved<2000)return;
+      const data=snap.val();
+      if(!data)return;
+      const myId=localStorage.getItem('kzkg_myId');
+      const myMember=myId?STATE.members.find(m=>m.id===myId):null;
+      STATE=Object.assign({},STATE,data);
+      // Make sure my member is always included
+      if(myMember&&!STATE.members.find(m=>m.id===myId)){
+        STATE.members=[...STATE.members,myMember];
+      }
+      localStorage.setItem('kzkg2026',JSON.stringify(STATE));
+      if(curPage==='home')renderHome();
+      else if(curPage==='expenses')renderExp();
+      else if(curPage==='summary')renderSum();
+    });
+  }catch(e){console.error('Firebase error:',e);updateFbBadge(false);fbSyncEnabled=false;}
+}
+function fbSave(){
+  if(!fbSyncEnabled||!fbDb)return;
+  clearTimeout(fbSaveTimer);
+  fbSaveTimer=setTimeout(()=>{
+    fbLastSaved=Date.now();
+    fbDb.ref('/kzkg2026/state').set(JSON.parse(JSON.stringify(STATE)));
+  },600);
+}
+function updateFbBadge(ok){
+  const el=document.getElementById('fb-badge');if(!el)return;
+  el.className='fb-badge '+(ok?'connected':'disconnected');
+  el.innerHTML=`<span class="fb-dot"></span>${ok?'🔥 Sync':'ตั้งค่า Firebase'}`;
+}
+function openFbSetup(){document.getElementById('fb-setup-ov').style.display='flex';}
+function closeFbSetup(){document.getElementById('fb-setup-ov').style.display='none';}
+function saveFbConfig(){
+  const raw=document.getElementById('fb-cfg-input').value.trim();
+  try{
+    const cleaned=raw.replace(/^const\s+firebaseConfig\s*=\s*/,'').replace(/;$/,'').trim();
+    const cfg=JSON.parse(cleaned);
+    if(!cfg.apiKey||!cfg.databaseURL){toast('ต้องมี apiKey และ databaseURL');return;}
+    localStorage.setItem('kzkg_fb_config',JSON.stringify(cfg));
+    closeFbSetup();
+    toast('✅ บันทึกแล้ว กำลัง reload...');
+    setTimeout(()=>location.reload(),1000);
+  }catch(e){toast('JSON ไม่ถูกต้อง ลองอีกครั้ง');}
+}
+
+// ================================================================
+// ITINERARY DATA
+// ================================================================
+const ITIN=[
+  {day:0,date:'22 ก.ค. 2026',title:'เดินทางถึงอัลมาตี',loc:'Almaty, Kazakhstan',flag:'🇰🇿',
+    wx:{lo:18,hi:28,icon:'🌤️',desc:'อากาศดี เย็นสบายตอนกลางคืน'},
+    hotel:{name:'Ахметова 4 Apartment',cost:27200,pp:6800,cur:'KZT',st:'Unpaid'},
+    events:[
+      {name:'Almaty International Airport',emoji:'✈️',time:'ตามตั๋ว',desc:'ลงจอดสนามบินอัลมาตี เข้า customs รับสัมภาระ รับรถเช่า เปลี่ยน SIM',lat:43.3521,lng:77.0405,cc:['Almaty_International_Airport','Almaty']},
+      {name:'เช็คอิน Ахметова 4',emoji:'🏠',time:'หลังถึง',desc:'ที่พักอพาร์ทเมนท์ใจกลางอัลมาตี พักผ่อนหลังเดินทาง',lat:43.2220,lng:76.8512,cc:['Almaty','Downtown_Almaty']}
+    ]},
+  {day:1,date:'23 ก.ค. 2026',title:'อัลมาตี → บิชเคก',loc:'Almaty → Bishkek, Kyrgyzstan',flag:'🇰🇬',
+    wx:{lo:20,hi:32,icon:'☀️',desc:'ร้อนและแจ่ม ดื่มน้ำให้เพียงพอระหว่างขับรถ'},
+    hotel:{name:'Madison Ave Hotel',cost:4930,pp:1232.5,cur:'THB',st:'Done'},
+    events:[
+      {name:'ขับรถสู่บิชเคก (~240km)',emoji:'🚗',time:'08:00',desc:'เดินทางจากอัลมาตีไปบิชเคก ผ่านด่านชายแดน Korday ~4 ชม. เตรียม Passport',lat:43.0510,lng:74.6368,cc:['Bishkek','Kazakhstan–Kyrgyzstan_border']},
+      {name:'Ala-Too Square',emoji:'🏛️',time:'บ่าย',desc:'จัตุรัสกลางเมืองบิชเคก ศูนย์กลางการเมืองและวัฒนธรรม',lat:42.8727,lng:74.5960,cc:['Ala-Too_Square','Bishkek']},
+      {name:'Osh Bazaar',emoji:'🛒',time:'เย็น',desc:'ตลาดท้องถิ่นที่ใหญ่ที่สุดของบิชเคก ผลไม้สด ของที่ระลึก',lat:42.8654,lng:74.5588,cc:['Osh_Bazaar,_Bishkek','Bishkek']},
+      {name:'Madison Ave Hotel',emoji:'🏨',time:'ค่ำ',desc:'เช็คอินโรงแรม (จองแล้ว ✅)',lat:42.8701,lng:74.5877,cc:['Hotels_in_Bishkek','Bishkek']}
+    ]},
+  {day:2,date:'24 ก.ค. 2026',title:'Ala Archa → Burana → Issyk-Kul',loc:'Bishkek → Issyk-Kul',flag:'🇰🇬',
+    wx:{lo:14,hi:26,icon:'⛅',desc:'เย็นในหุบเขา แต่งตัวเป็นชั้น อุณหภูมิต่างกันมาก'},
+    hotel:{name:'Милый дом Guesthouse',cost:114,pp:28.5,cur:'USD',st:'Unpaid'},
+    events:[
+      {name:'Ala Archa National Park',emoji:'🏔️',time:'08:00',desc:'อุทยานแห่งชาติ Tian Shan เดินป่า น้ำตก Ak-Sai วิวภูเขาน้ำแข็ง Korona Peak',lat:42.5532,lng:74.4836,cc:['Ala_Archa_National_Park','Ak-Sai_waterfall']},
+      {name:'Burana Tower',emoji:'🗼',time:'13:00',desc:'หอคอยมินาเรทโบราณ 1,000+ ปี สมัย Karakhanid พิพิธภัณฑ์และ Balbal stones',lat:42.7425,lng:75.2571,cc:['Burana_tower','Burana']},
+      {name:'ทะเลสาบอิสซีกกุล (ฝั่งใต้)',emoji:'💧',time:'17:00',desc:'ทะเลสาบน้ำเค็มใหญ่ที่สุดในโลกลำดับที่ 2 น้ำใสสีฟ้าในเทือกเขา Tian Shan',lat:42.3800,lng:77.5000,cc:['Issyk-Kul','Issyk_Kul_Lake']}
+    ]},
+  {day:3,date:'25 ก.ค. 2026',title:'Konorchek → Skazka Canyon',loc:'Issyk-Kul, Kyrgyzstan',flag:'🇰🇬',
+    wx:{lo:18,hi:30,icon:'☀️',desc:'ร้อนในหุบเขา SPF สูงจำเป็น หมวกและน้ำเยอะๆ'},
+    hotel:{name:'Aisun Yurt Camp',cost:114,pp:28.5,cur:'USD',st:'Unpaid'},
+    events:[
+      {name:'Konorchek Canyon',emoji:'🏜️',time:'09:00',desc:'หุบเขาหินสีแดง-น้ำตาลสวยงาม เดินป่าง่าย วิวทิวทัศน์สวย',lat:42.4225,lng:76.3617,cc:['Konorchek_Canyon','Canyons_in_Kyrgyzstan']},
+      {name:'Skazka Canyon (Fairy Tale)',emoji:'🧚',time:'13:00',desc:'"หุบเขาเทพนิยาย" หินสีส้มแดงริมทะเลสาบ Issyk-Kul สวยมากตอนพระอาทิตย์ตก',lat:42.3239,lng:77.3839,cc:['Skazka_Canyon','Kyrgyzstan']},
+      {name:'Aisun Yurt Camp',emoji:'⛺',time:'18:00',desc:'นอนเต็นท์ยูร์ต ประสบการณ์แท้ของชาวเร่ร่อน อาหารพื้นเมือง ดูดาว',lat:42.3800,lng:77.5000,cc:['Yurt','Yurts_in_Kyrgyzstan']}
+    ]},
+  {day:4,date:'26 ก.ค. 2026',title:'Altyn Arashan & Ala Kul Trek',loc:'Karakol, Kyrgyzstan',flag:'🇰🇬',
+    wx:{lo:7,hi:20,icon:'🌥️',desc:'เย็นมากในระดับสูง เสื้อกันหนาว ถุงเท้าหนา รองเท้า hiking'},
+    hotel:{name:'Ala Kul Camp (3,500m)',cost:13400,pp:3350,cur:'KZT',st:'Unpaid'},
+    events:[
+      {name:'เมืองคาราคอล',emoji:'🏘️',time:'08:00',desc:'เมืองริมทะเลสาบ Issyk-Kul ฝั่งตะวันออก Holy Trinity Church ตลาดเช้า',lat:42.4900,lng:78.3900,cc:['Karakol,_Kyrgyzstan','Karakol']},
+      {name:'Altyn Arashan Valley',emoji:'♨️',time:'10:00',desc:'หุบเขาสวรรค์ น้ำพุร้อนธรรมชาติ ป่าสนสวยงาม ต้องใช้รถ 4WD',lat:42.4700,lng:78.5500,cc:['Altyn-Arashan','Hot_springs_in_Kyrgyzstan']},
+      {name:'Ala Kul Lake (3,500m)',emoji:'🏔️',time:'15:00',desc:'ทะเลสาบแอลไพน์สีฟ้าเข้ม ระดับ 3,500m เดินขึ้น ~4 ชม. วิวยอดเยี่ยม',lat:42.2400,lng:78.5800,cc:['Ala_Kul_Lake','Kyrgyzstan']}
+    ]},
+  {day:5,date:'27 ก.ค. 2026',title:'Karakol → Charyn Canyon',loc:'Charyn Canyon, Kazakhstan',flag:'🇰🇿',
+    wx:{lo:22,hi:37,icon:'🌞',desc:'ร้อนมากในหุบเขา ดื่มน้ำเยอะ หมวก ครีมกันแดด SPF50+'},
+    hotel:{name:'Pana Unique Charyn',cost:171800,pp:42950,cur:'KZT',st:'Unpaid'},
+    events:[
+      {name:'ออกเดินทางจากคาราคอล (~400km)',emoji:'🚗',time:'07:00',desc:'ขับรถระยะไกล ผ่านชายแดน KG→KZ ~6-7 ชม. รวมพัก',lat:43.3483,lng:79.0717,cc:['Roads_in_Kyrgyzstan','Kazakhstan']},
+      {name:'Charyn Canyon',emoji:'🏜️',time:'15:00',desc:'"Grand Canyon แห่งเอเชียกลาง" หุบเขาหินสีส้มแดง ลึก 150-300m ยาว 80km',lat:43.3483,lng:79.0717,cc:['Charyn_Canyon','Charyn_River']},
+      {name:'Pana Unique Hotel',emoji:'🏕️',time:'18:00',desc:'ที่พักริมหุบเขา Charyn ออกแบบกลมกลืนธรรมชาติ ดูดาวสวยมาก',lat:43.3500,lng:79.0500,cc:['Charyn_Canyon','Hotels_in_Kazakhstan']}
+    ]},
+  {day:6,date:'28 ก.ค. 2026',title:'Kaindy → Kolsai Lakes',loc:'Kolsai, Kazakhstan',flag:'🇰🇿',
+    wx:{lo:14,hi:26,icon:'🌲',desc:'เย็นสบายในป่าสน อากาศสดชื่น เย็นตอนเช้า-ค่ำ'},
+    hotel:{name:'Kolsai Star House',cost:48400,pp:12100,cur:'KZT',st:'Unpaid'},
+    events:[
+      {name:'Kaindy Lake (ต้นไม้จมน้ำ)',emoji:'🌊',time:'09:00',desc:'ทะเลสาบที่เกิดจากแผ่นดินไหว ต้นสนจมใต้น้ำสวยงาม น้ำใสสีฟ้าเขียว',lat:43.0545,lng:78.7231,cc:['Kaindy_lake','Lake_Kaindy']},
+      {name:'Kolsai Lakes (ไข่มุก Tian Shan)',emoji:'💎',time:'13:00',desc:'ชุดทะเลสาบ 3 แห่งในหุบเขา น้ำสีเขียวมรกต เดินป่าเบาๆ',lat:43.0296,lng:78.6204,cc:['Kolsai_lakes','Kolsay_Lakes_National_Park']},
+      {name:'Kolsai Star House',emoji:'🏠',time:'18:00',desc:'เช็คอิน อาหารเย็น local พักผ่อน',lat:43.0280,lng:78.6200,cc:['Kolsai_lakes','Saty,_Kazakhstan']}
+    ]},
+  {day:7,date:'29 ก.ค. 2026',title:'กลับอัลมาตี',loc:'Kolsai → Almaty',flag:'🇰🇿',
+    wx:{lo:17,hi:28,icon:'⛅',desc:'อากาศดีระหว่างทาง ช่วงบ่ายในเมืองอาจร้อน'},
+    hotel:{name:'Grand Opera Hotel (คืน 1/2)',cost:63000,pp:15750,cur:'KZT',st:'Unpaid'},
+    events:[
+      {name:'เดินทางกลับอัลมาตี (~280km)',emoji:'🚗',time:'09:00',desc:'ขับรถจาก Kolsai กลับ Almaty ~4 ชม.',lat:43.2220,lng:76.8512,cc:['Almaty_Region','Kazakhstan']},
+      {name:'Green Bazaar',emoji:'🛒',time:'14:00',desc:'ตลาดสดที่มีชีวิตชีวาของอัลมาตี ผลไม้สด ขนม ของที่ระลึก',lat:43.2619,lng:76.9512,cc:['Green_Bazaar,_Almaty','Almaty_Green_Bazaar']},
+      {name:'Grand Opera Hotel',emoji:'🏨',time:'17:00',desc:'เช็คอินโรงแรมหรู ใจกลางอัลมาตี (จอง 2 คืน Day7-8)',lat:43.2625,lng:76.9281,cc:['Hotels_in_Almaty','Almaty']}
+    ]},
+  {day:8,date:'30 ก.ค. 2026',title:'Big Almaty Lake & เมืองอัลมาตี',loc:'Almaty',flag:'🇰🇿',
+    wx:{lo:14,hi:29,icon:'🌤️',desc:'เย็นที่ทะเลสาบ ร้อนในเมือง เปลี่ยนเสื้อผ้าได้'},
+    hotel:{name:'Grand Opera Hotel (คืน 2/2)',cost:63000,pp:15750,cur:'KZT',st:'Unpaid'},
+    events:[
+      {name:'Big Almaty Lake (UAZ 4WD)',emoji:'🏔️',time:'08:00',desc:'ทะเลสาบแอลไพน์สีฟ้าเข้ม 2,511m ต้องนั่ง UAZ 4WD (50,000 KZT/คัน)',lat:43.0606,lng:76.9857,cc:['Big_Almaty_Lake','Big_Almaty_Peak']},
+      {name:'Kok Tobe Hill',emoji:'🎡',time:'15:00',desc:'กระเช้าไฟฟ้า สวนสนุก วิว 360° ของอัลมาตีและภูเขา',lat:43.2519,lng:76.9701,cc:['Kok-Tobe','Kok_Tobe']},
+      {name:'Zenkov Cathedral',emoji:'⛪',time:'17:00',desc:'โบสถ์ไม้สวยงามใน Panfilov Park สร้างปี 1907 ไม่ใช้ตะปูแม้แต่ตัวเดียว',lat:43.2687,lng:76.9448,cc:['Zenkov_Cathedral','Ascension_Cathedral,_Almaty']}
+    ]},
+  {day:9,date:'31 ก.ค. 2026',title:'เที่ยวอัลมาตีวันสุดท้าย',loc:'Almaty',flag:'🇰🇿',
+    wx:{lo:19,hi:31,icon:'☀️',desc:'ร้อนและแจ่ม เดินเที่ยวในเมืองสบาย'},
+    hotel:{name:'–',cost:0,pp:0,cur:'KZT',st:''},
+    events:[
+      {name:'Central State Museum',emoji:'🏛️',time:'10:00',desc:'พิพิธภัณฑ์ใหญ่ที่สุดในคาซัคสถาน Golden Man ชุดทองคำโบราณ',lat:43.2377,lng:76.9140,cc:['Central_State_Museum,_Almaty','Almaty']},
+      {name:'Arbat (Pedestrian Street)',emoji:'🚶',time:'13:00',desc:'ถนนคนเดิน ร้านอาหาร กาแฟ street food ของที่ระลึก',lat:43.2605,lng:76.9368,cc:['Almaty','Streets_in_Almaty']},
+      {name:'ช้อปปิ้ง & ของฝาก',emoji:'🛍️',time:'15:00',desc:'บะหมี่ Kazakh ช็อกโกแลต ผ้าไหม ขนม Baursak ชา',lat:43.2390,lng:76.8927,cc:['Shopping_malls_in_Almaty','Almaty']}
+    ]},
+  {day:10,date:'1 ส.ค. 2026',title:'เดินทางกลับบ้าน 🏠',loc:'Almaty → Home',flag:'✈️',
+    wx:{lo:18,hi:28,icon:'🌤️',desc:'ตรวจสอบพยากรณ์อากาศก่อนเดินทาง'},
+    hotel:{name:'–',cost:0,pp:0,cur:'KZT',st:''},
+    events:[
+      {name:'เช็คเอาท์ & เดินทางสนามบิน',emoji:'🧳',time:'ตามตั๋ว',desc:'เช็คเอาท์ คืนรถเช่า เดินทางสู่ Almaty International Airport',lat:43.3521,lng:77.0405,cc:['Almaty_International_Airport','Almaty']}
+    ]}
+];
+
+const PRECOSTS=[
+  {item:'Ахметова 4 Apartment – Day 0',cost:27200,cur:'KZT',pp:6800,st:'Unpaid'},
+  {item:'Madison Ave Hotel, Bishkek – Day 1',cost:4930,cur:'THB',pp:1232.5,st:'Done'},
+  {item:'Милый дом, Issyk-Kul – Day 2',cost:114,cur:'USD',pp:28.5,st:'Unpaid'},
+  {item:'Aisun Yurt Camp – Day 3',cost:114,cur:'USD',pp:28.5,st:'Unpaid'},
+  {item:'Ala Kul Camp – Day 4',cost:13400,cur:'KZT',pp:3350,st:'Unpaid'},
+  {item:'Pana Unique Charyn – Day 5',cost:171800,cur:'KZT',pp:42950,st:'Unpaid'},
+  {item:'Kolsai Star House – Day 6',cost:48400,cur:'KZT',pp:12100,st:'Unpaid'},
+  {item:'Grand Opera Hotel (2 คืน) – Day 7-8',cost:126000,cur:'KZT',pp:31500,st:'Unpaid'},
+  {item:'Big Almaty Lake UAZ 4WD – Day 8',cost:50000,cur:'KZT',pp:12500,st:'To-do'},
+  {item:'รถเช่าตลอดทริป (11 วัน)',cost:309000,cur:'KZT',pp:77250,st:'Unpaid'},
+];
+
+const DRESSCODES=[
+  {city:'Almaty 🇰🇿',code:'Smart casual เสื้อผ้าเบาบาง รองเท้าเดินนาน',temp:'18–32°C'},
+  {city:'Bishkek 🇰🇬',code:'Casual สบาย กางเกงขายาว/กระโปรงยาวสำหรับสถานที่ศาสนา',temp:'20–32°C'},
+  {city:'ภูเขา/Trekking 🏔️',code:'เสื้อผ้าหลายชั้น เสื้อกันหนาว waterproof jacket รองเท้า hiking',temp:'7–22°C'},
+  {city:'Charyn Canyon 🏜️',code:'เสื้อเบาบาง หมวก ครีมกันแดด SPF50+ รองเท้าเดินหิน',temp:'22–37°C'},
+  {city:'สถานที่ศาสนา 🕌',code:'คลุมไหล่ ขาถึงหัวเข่าขึ้นไป ไม่มีเสื้อแขนกุด',temp:'–'},
+];
+
+// ================================================================
+// STATE
+// ================================================================
+let STATE={
+  members:[],
+  expenses:[],
+  notes:[
+    {id:'n1',title:'ข้อมูลทั่วไป',content:'ประเทศ: Kazakhstan 🇰🇿 & Kyrgyzstan 🇰🇬\nสกุลเงิน: KZT (เทงเก้) / KGS (สอม)\nTimeZone: UTC+6 ทั้ง 2 ประเทศ\nVisa: Thai passport ไม่ต้อง Visa ✅\nภาษา: Kazakh/Russian / Kyrgyz/Russian',expanded:false},
+    {id:'n2',title:'เบอร์ฉุกเฉิน',content:'ตำรวจ KZ/KG: 102\nรถพยาบาล: 103\nไฟไหม้: 101\nสถานทูตไทยในคาซัคสถาน: +7 727 264 3890',expanded:false},
+    {id:'n3',title:'SIM Card & Internet',content:'Kazakhstan: Beeline KZ / Kcell / Tele2\nKyrgyzstan: Beeline KG / O! / MegaCom\nซื้อที่สนามบิน ~500–1,000 KZT / 10–20GB\neSIM: Airalo สะดวกกว่า',expanded:false},
+  ],
+  settings:{usd:33,kzt:0.07,kgs:0.43,people:4}
+};
+
+const CATS=[
+  {id:'hotel',label:'ที่พัก',emoji:'🏨'},{id:'transport',label:'เดินทาง',emoji:'🚗'},
+  {id:'food',label:'อาหาร',emoji:'🍽️'},{id:'activity',label:'กิจกรรม',emoji:'🎯'},
+  {id:'shopping',label:'ช้อปปิ้ง',emoji:'🛍️'},{id:'fuel',label:'น้ำมัน',emoji:'⛽'},
+  {id:'medical',label:'ยา/สุขภาพ',emoji:'💊'},{id:'sim',label:'SIM/เน็ต',emoji:'📶'},
+  {id:'other',label:'อื่นๆ',emoji:'📦'},
+];
+const CURS=['THB','KZT','KGS','USD'];
+
+// ================================================================
+// HELPERS
+// ================================================================
+function toTHB(a,c){const r=STATE.settings;if(c==='THB')return a;if(c==='USD')return a*r.usd;if(c==='KZT')return a*r.kzt;if(c==='KGS')return a*r.kgs;return a;}
+function fB(n){return '฿'+Math.round(n).toLocaleString('th-TH');}
+function fA(a,c){const s={THB:'฿',KZT:'₸',KGS:'с',USD:'$'};return(s[c]||'')+Number(a).toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0});}
+function uid(){return 'i'+Date.now()+Math.random().toString(36).slice(2,6);}
+function gM(id){return STATE.members.find(m=>m.id===id);}
+function gC(id){return CATS.find(c=>c.id===id)||CATS[8];}
+
+// ================================================================
+// PERSISTENCE
+// ================================================================
+function loadState(){
+  if(typeof SHARED_STATE!=='undefined'){try{STATE=Object.assign(STATE,SHARED_STATE);localStorage.setItem('kzkg2026',JSON.stringify(STATE));return;}catch(e){}}
+  const h=location.hash.slice(1);
+  if(h.startsWith('state=')){try{STATE=Object.assign(STATE,JSON.parse(decodeURIComponent(escape(atob(h.slice(6))))));localStorage.setItem('kzkg2026',JSON.stringify(STATE));history.replaceState(null,'',location.pathname);return;}catch(e){}}
+  try{const s=localStorage.getItem('kzkg2026');if(s)STATE=Object.assign(STATE,JSON.parse(s));}catch(e){}
+}
+function save(){
+  try{localStorage.setItem('kzkg2026',JSON.stringify(STATE));}catch(e){}
+  fbSave();
+}
+
+// ================================================================
+// NAVIGATION
+// ================================================================
+let curPage='home';
+function goTo(page){
+  curPage=page;
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelector(`.nav-btn[data-page="${page}"]`).classList.add('active');
+  document.getElementById('fab').style.display=page==='expenses'?'flex':'none';
+  if(page==='home')renderHome();
+  if(page==='itinerary')renderItin();
+  if(page==='expenses')renderExp();
+  if(page==='summary')renderSum();
+}
+
+// ================================================================
+// HOME
+// ================================================================
+let prepShowing=false;
+
+function renderHome(){
+  const today=new Date();
+  const ts=new Date('2026-07-22T00:00:00+07:00');
+  const te=new Date('2026-08-01T23:59:59+07:00');
+  const onTrip=today>=ts&&today<=te;
+  const done=today>te;
+
+  let cdHtml='';
+  if(done){
+    cdHtml=`<div class="countdown done"><div class="cd-unit"><span class="cd-num" style="font-size:18px">🎉</span><span class="cd-lbl">จบแล้ว</span></div></div>`;
+  } else if(onTrip){
+    const d=Math.floor((today-ts)/86400000)+1;
+    cdHtml=`<div class="countdown on-trip"><div class="cd-unit"><span class="cd-num" style="font-size:16px">🌏 วันที่ ${d} ของทริป!</span></div></div>`;
+  } else {
+    cdHtml=`<div class="countdown" id="cd-box">
+      <div class="cd-unit"><span class="cd-num" id="cd-d">--</span><span class="cd-lbl">วัน</span></div>
+      <span class="cd-sep">:</span>
+      <div class="cd-unit"><span class="cd-num" id="cd-h">--</span><span class="cd-lbl">ชม.</span></div>
+      <span class="cd-sep">:</span>
+      <div class="cd-unit"><span class="cd-num" id="cd-m">--</span><span class="cd-lbl">นาที</span></div>
+      <span class="cd-sep">:</span>
+      <div class="cd-unit"><span class="cd-num" id="cd-s">--</span><span class="cd-lbl">วินาที</span></div>
+    </div>`;
+  }
+
+  const myId=localStorage.getItem('kzkg_myId');
+  const membH=STATE.members.length
+    ?STATE.members.map(m=>`
+      <div class="member-card" onclick="editMem('${m.id}')">
+        <div class="member-avatar" style="background:${m.color}20;border:2px solid ${m.color}">
+          ${m.photo?`<img src="${m.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`:`<span style="font-size:26px">${m.emoji}</span>`}
+        </div>
+        <div class="member-name">${m.name}</div>
+        ${m.id===myId?'<div class="member-me-tag">ฉัน</div>':'<div style="height:16px"></div>'}
+      </div>`).join('')
+    :`<p class="empty-txt">ยังไม่มีสมาชิก 🌱</p>`;
+
+  const notesH=STATE.notes.map(n=>`
+    <div class="note-card">
+      <div class="note-header" onclick="toggleNote('${n.id}')">
+        <span class="note-title">${n.title}</span>
+        <div class="note-actions">
+          <button class="icon-btn" onclick="event.stopPropagation();openNoteM('${n.id}')">✏️</button>
+          <button class="icon-btn" onclick="event.stopPropagation();delNote('${n.id}')">🗑️</button>
+          <span class="note-chev">${n.expanded?'▲':'▼'}</span>
+        </div>
+      </div>
+      ${n.expanded?`<div class="note-body">${n.content.replace(/</g,'&lt;').replace(/\n/g,'<br>')}</div>`:''}</div>`).join('');
+
+  const totalThb=PRECOSTS.reduce((s,c)=>s+toTHB(c.pp,c.cur),0);
+  const costRows=PRECOSTS.map((c,i)=>{
+    const sc=c.st==='Done'?'color:var(--green)':c.st==='Unpaid'?'color:var(--red)':'color:var(--yellow)';
+    const hide=!prepShowing&&i>=3;
+    return `<div class="cost-row" style="${hide?'display:none':''}">
+      <div class="cost-item">${c.item}</div>
+      <div class="cost-detail"><span class="cost-amount">${fA(c.pp,c.cur)}/คน</span><span style="font-size:11px;${sc}">${c.st}</span></div>
+    </div>`;
+  }).join('');
+
+  const dressRows=DRESSCODES.map(d=>`
+    <div class="dress-row">
+      <div class="dress-city">${d.city}<span class="dress-temp">${d.temp}</span></div>
+      <div class="dress-code">${d.code}</div>
+    </div>`).join('');
+
+  const r=STATE.settings;
+
+  document.getElementById('home-cnt').innerHTML=`
+    <div class="home-hero">
+      <span class="hero-leaf hero-leaf-1">🌲</span>
+      <span class="hero-leaf hero-leaf-2">🌿</span>
+      <div class="trip-label">TRIP 2026</div>
+      <div class="trip-title">🌏 KZ + KG</div>
+      <div class="trip-dates">Kazakhstan & Kyrgyzstan · 22 ก.ค. – 1 ส.ค. · 11 วัน</div>
+      <div style="display:flex;align-items:flex-start;flex-direction:column;gap:8px;position:relative;z-index:1">
+        ${cdHtml}
+        <button class="fb-badge ${fbSyncEnabled?'connected':'disconnected'}" id="fb-badge" onclick="openFbSetup()">
+          <span class="fb-dot"></span>${fbSyncEnabled?'🔥 Firebase Sync':'ตั้งค่า Firebase Sync'}
+        </button>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="sec-header"><h2>👥 สมาชิกทริป</h2><button class="add-btn" onclick="editMem(null)">+ เพิ่ม</button></div>
+      <div class="members-scroll">${membH}</div>
+    </div>
+
+    <div class="section">
+      <div class="sec-header"><h2>📌 สิ่งสำคัญที่ต้องจำ</h2><button class="add-btn" onclick="openNoteM(null)">+ เพิ่ม</button></div>
+      <div id="notes-list">${notesH||'<p class="empty-txt">ยังไม่มีโน้ต กด + เพิ่มได้เลย</p>'}</div>
+    </div>
+
+    <div class="section">
+      <div class="sec-header"><h2>🎒 สิ่งที่ต้องเตรียมล่วงหน้า</h2></div>
+      <div class="prep-tabs">
+        <button class="tab-btn active" onclick="swPrep(this,'costs')">💰 ค่าใช้จ่าย</button>
+        <button class="tab-btn" onclick="swPrep(this,'dress')">👔 การแต่งกาย</button>
+      </div>
+      <div id="prep-costs" class="prep-panel active">
+        <div class="prep-card">
+          ${costRows}
+          <button class="prep-see-more" onclick="togglePrep()">
+            ${prepShowing?'▲ ย่อลง':`▼ ดูทั้งหมด ${PRECOSTS.length} รายการ`}
+          </button>
+        </div>
+        <div class="costs-total"><span>รวม/คน (ที่จองไว้)</span><span class="total-amount">${fB(totalThb)}</span></div>
+        <p class="cost-note">* ยังไม่รวมอาหาร ของที่ระลึก ค่าเข้า ≈ 1,000–1,500 บาท/วัน/คน</p>
+      </div>
+      <div id="prep-dress" class="prep-panel">
+        <div class="prep-card">${dressRows}</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="sec-header"><h2>⚙️ อัตราแลกเปลี่ยน</h2></div>
+      <div class="rates-grid">
+        <div class="rate-item"><label>1 USD =</label><input type="number" value="${r.usd}" onchange="updRate('usd',this.value)"><span style="color:var(--text2)">THB</span></div>
+        <div class="rate-item"><label>1 KZT =</label><input type="number" step="0.001" value="${r.kzt}" onchange="updRate('kzt',this.value)"><span style="color:var(--text2)">THB</span></div>
+        <div class="rate-item"><label>1 KGS =</label><input type="number" step="0.001" value="${r.kgs}" onchange="updRate('kgs',this.value)"><span style="color:var(--text2)">THB</span></div>
+      </div>
+    </div>
+
+    <div class="almaty-banner">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Almaty_big.jpg/1280px-Almaty_big.jpg"
+        onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/d/de/Almaty.jpg/1280px-Almaty.jpg';this.onerror=()=>{this.src='https://picsum.photos/seed/almaty-kz/800/400';}"
+        alt="Almaty">
+      <div class="almaty-banner-ov">
+        <div>
+          <div class="almaty-banner-title">🏙️ Almaty, Kazakhstan</div>
+          <div class="almaty-banner-sub">จุดหมายปลายทางของเรา · กรกฎาคม 2026</div>
+        </div>
+      </div>
+    </div>`;
+
+  if(!done&&!onTrip)startCountdown();
+}
+
+function togglePrep(){
+  prepShowing=!prepShowing;
+  const wasOnCosts=document.getElementById('prep-costs')&&document.getElementById('prep-costs').classList.contains('active');
+  renderHome();
+  if(!wasOnCosts){
+    const c=document.getElementById('prep-costs'),d=document.getElementById('prep-dress');
+    if(c)c.classList.remove('active');
+    if(d)d.classList.add('active');
+  }
+}
+function swPrep(btn,tab){
+  document.querySelectorAll('.prep-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('prep-'+tab).classList.add('active');btn.classList.add('active');
+}
+function updRate(k,v){STATE.settings[k]=parseFloat(v)||STATE.settings[k];save();}
+
+// ================================================================
+// COUNTDOWN
+// ================================================================
+let cdInterval=null;
+function startCountdown(){
+  clearInterval(cdInterval);
+  const target=new Date('2026-07-22T00:00:00+07:00');
+  function tick(){
+    const dEl=document.getElementById('cd-d');if(!dEl){clearInterval(cdInterval);return;}
+    const diff=target-new Date();
+    if(diff<=0){clearInterval(cdInterval);return;}
+    const days=Math.floor(diff/86400000);
+    const hrs=Math.floor((diff%86400000)/3600000);
+    const mins=Math.floor((diff%3600000)/60000);
+    const secs=Math.floor((diff%60000)/1000);
+    dEl.textContent=days;
+    const hEl=document.getElementById('cd-h'),mEl=document.getElementById('cd-m'),sEl=document.getElementById('cd-s');
+    if(hEl)hEl.textContent=String(hrs).padStart(2,'0');
+    if(mEl)mEl.textContent=String(mins).padStart(2,'0');
+    if(sEl)sEl.textContent=String(secs).padStart(2,'0');
+  }
+  tick();cdInterval=setInterval(tick,1000);
+}
+
+// ================================================================
+// ONBOARDING
+// ================================================================
+const OB_EMOJIS=['👩','👨','🧑','👧','👦','🧔','👩‍🦰','🧕','🥷','🧑‍💼','👩‍🦱','🌸'];
+const OB_COLORS=['#5c9e6e','#FF6B9D','#4ECDC4','#FFE66D','#A8E6CF','#FF8B94','#B5EAD7','#FFDAC1','#C7CEEA','#90d4a0'];
+
+function setupOnboarding(){
+  document.getElementById('ob-emojis').innerHTML=OB_EMOJIS.map((e,i)=>
+    `<span class="ob-emo ${i===2?'sel':''}" onclick="selObEmo(this,'${e}')">${e}</span>`).join('');
+  document.getElementById('ob-colors').innerHTML=OB_COLORS.map((c,i)=>
+    `<span class="ob-clr ${i===0?'sel':''}" style="background:${c}" onclick="selObClr(this,'${c}')"></span>`).join('');
+  document.getElementById('ob-emo-val').value=OB_EMOJIS[2];
+  document.getElementById('ob-clr-val').value=OB_COLORS[0];
+}
+function selObEmo(el,e){document.querySelectorAll('.ob-emo').forEach(x=>x.classList.remove('sel'));el.classList.add('sel');document.getElementById('ob-emo-val').value=e;}
+function selObClr(el,c){document.querySelectorAll('.ob-clr').forEach(x=>x.classList.remove('sel'));el.classList.add('sel');document.getElementById('ob-clr-val').value=c;}
+function saveOnboarding(){
+  const name=document.getElementById('ob-name').value.trim();
+  if(!name){document.getElementById('ob-name').style.borderColor='#f87171';toast('กรุณากรอกชื่อเล่น');return;}
+  const emoji=document.getElementById('ob-emo-val').value;
+  const color=document.getElementById('ob-clr-val').value;
+  const m={id:uid(),name,emoji,color,photo:null};
+  STATE.members=[...STATE.members,m];
+  localStorage.setItem('kzkg_myId',m.id);
+  save();
+  document.getElementById('onboarding-ov').style.display='none';
+  toast('ยินดีต้อนรับ '+name+'! 🎉');
+  goTo('home');
+}
+
+// ================================================================
+// NOTES
+// ================================================================
+function toggleNote(id){const n=STATE.notes.find(x=>x.id===id);if(n){n.expanded=!n.expanded;save();renderHome();}}
+function delNote(id){if(confirm('ลบโน้ตนี้?')){STATE.notes=STATE.notes.filter(n=>n.id!==id);save();renderHome();}}
+function openNoteM(id){
+  const n=id?STATE.notes.find(x=>x.id===id):null;
+  showM(`<div class="mhdr"><h3>${n?'แก้ไขโน้ต':'เพิ่มโน้ต'}</h3></div>
+    <div class="mbdy">
+      <label>หัวข้อ</label><input type="text" id="nt-ttl" placeholder="ชื่อโน้ต" value="${n?n.title.replace(/"/g,'&quot;'):''}">
+      <label>เนื้อหา</label><textarea id="nt-bdy" rows="6" placeholder="รายละเอียด...">${n?n.content:''}</textarea>
+    </div>
+    <div class="mftr"><span></span><div style="display:flex;gap:8px"><button class="btn-cancel" onclick="closeM()">ยกเลิก</button><button class="btn-save" onclick="saveNote('${id||''}')">บันทึก</button></div></div>`);
+}
+function saveNote(id){
+  const t=document.getElementById('nt-ttl').value.trim(),b=document.getElementById('nt-bdy').value;
+  if(!t){toast('กรุณากรอกหัวข้อ');return;}
+  if(id){const n=STATE.notes.find(x=>x.id===id);if(n){n.title=t;n.content=b;}}
+  else STATE.notes.push({id:uid(),title:t,content:b,expanded:false});
+  save();closeM();renderHome();
+}
+
+// ================================================================
+// MEMBERS
+// ================================================================
+const EMJS=['👩','👨','🧑','👧','👦','👱','🧔','👩‍🦰','👩‍🦱','🧑‍🦲','🥷','🧑‍💼','🧕','👲'];
+const CLRS=['#5c9e6e','#FF6B9D','#4ECDC4','#FFE66D','#A8E6CF','#FF8B94','#B5EAD7','#FFDAC1','#C7CEEA','#90d4a0'];
+
+function editMem(id){
+  const m=id?gM(id):null;
+  const eos=EMJS.map(e=>`<span class="emo-opt ${m&&m.emoji===e?'sel':''}" onclick="sEmo(this,'${e}')">${e}</span>`).join('');
+  const cos=CLRS.map(c=>`<span class="clr-opt ${m&&m.color===c?'sel':''}" style="background:${c}" onclick="sClr(this,'${c}')"></span>`).join('');
+  showM(`<div class="mhdr"><h3>${m?'แก้ไขสมาชิก':'เพิ่มสมาชิก'}</h3></div>
+    <div class="mbdy">
+      <div style="display:flex;justify-content:center;margin-bottom:4px">
+        <div class="mav-lg" id="mav" style="background:${(m&&m.color)||CLRS[0]}20;border:3px solid ${(m&&m.color)||CLRS[0]}">
+          ${m&&m.photo?`<img src="${m.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`:`<span id="mep" style="font-size:36px">${(m&&m.emoji)||EMJS[0]}</span>`}
+        </div>
+      </div>
+      <label>ชื่อ</label><input type="text" id="mn" placeholder="ชื่อสมาชิก" value="${m?m.name.replace(/"/g,'&quot;'):''}">
+      <label>อีโมจิ</label><div class="emoji-grid">${eos}</div>
+      <label>สี</label><div class="clr-grid">${cos}</div>
+      <label>รูปโปรไฟล์</label>
+      <div class="pho-area">
+        <input type="file" id="mph" accept="image/*" style="display:none" onchange="hdlPho(this)">
+        <button class="btn-upload" onclick="document.getElementById('mph').click()">📷 อัพโหลดรูป</button>
+        ${m&&m.photo?`<button class="btn-rmpho" onclick="rmPho()">🗑️ ลบรูป</button>`:''}
+      </div>
+      <input type="hidden" id="me" value="${m?m.emoji:EMJS[0]}">
+      <input type="hidden" id="mc" value="${m?m.color:CLRS[0]}">
+      <input type="hidden" id="mp" value="${m&&m.photo?m.photo:''}">
+    </div>
+    <div class="mftr">
+      ${m&&STATE.members.length>1?`<button class="btn-del" onclick="delMem('${id}')">ลบ</button>`:'<span></span>'}
+      <div style="display:flex;gap:8px"><button class="btn-cancel" onclick="closeM()">ยกเลิก</button><button class="btn-save" onclick="saveMem('${id||''}')">บันทึก</button></div>
+    </div>`);
+}
+function sEmo(el,e){document.querySelectorAll('.emo-opt').forEach(x=>x.classList.remove('sel'));el.classList.add('sel');document.getElementById('me').value=e;const ep=document.getElementById('mep');if(ep)ep.textContent=e;}
+function sClr(el,c){document.querySelectorAll('.clr-opt').forEach(x=>x.classList.remove('sel'));el.classList.add('sel');document.getElementById('mc').value=c;const av=document.getElementById('mav');if(av){av.style.background=c+'20';av.style.border='3px solid '+c;}}
+function hdlPho(inp){
+  const f=inp.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=e=>{const img=new Image();img.onload=()=>{const cv=document.createElement('canvas');let w=img.width,h=img.height,mx=200;if(w>h){if(w>mx){h=Math.round(h*mx/w);w=mx;}}else{if(h>mx){w=Math.round(w*mx/h);h=mx;}}cv.width=w;cv.height=h;cv.getContext('2d').drawImage(img,0,0,w,h);const d=cv.toDataURL('image/jpeg',.75);document.getElementById('mp').value=d;const av=document.getElementById('mav');if(av)av.innerHTML=`<img src="${d}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;};img.src=e.target.result;};r.readAsDataURL(f);
+}
+function rmPho(){document.getElementById('mp').value='';const av=document.getElementById('mav'),e=document.getElementById('me').value;if(av)av.innerHTML=`<span id="mep" style="font-size:36px">${e}</span>`;}
+function saveMem(id){
+  const name=document.getElementById('mn').value.trim();if(!name){toast('กรุณากรอกชื่อ');return;}
+  const emoji=document.getElementById('me').value,color=document.getElementById('mc').value,photo=document.getElementById('mp').value||null;
+  if(id){const m=gM(id);if(m)Object.assign(m,{name,emoji,color,photo});}
+  else STATE.members.push({id:uid(),name,emoji,color,photo});
+  save();closeM();renderHome();
+}
+function delMem(id){
+  if(!confirm('ลบสมาชิกนี้?'))return;
+  STATE.members=STATE.members.filter(m=>m.id!==id);
+  STATE.expenses.forEach(e=>{e.splits=e.splits.filter(s=>s.memberId!==id);if(e.paidBy===id&&STATE.members.length>0)e.paidBy=STATE.members[0].id;});
+  save();closeM();renderHome();
+}
+
+// ================================================================
+// ITINERARY
+// ================================================================
+function renderItin(){
+  document.getElementById('itin-cnt').innerHTML=ITIN.map(day=>`
+    <div class="day-card">
+      <div class="day-header" onclick="togDay(${day.day})">
+        <div class="day-info">
+          <span class="day-flag">${day.flag}</span>
+          <div>
+            <div class="day-num">วันที่ ${day.day} · ${day.date}</div>
+            <div class="day-title">${day.title}</div>
+            <div class="day-loc">📍 ${day.loc}</div>
+          </div>
+        </div>
+        <div class="day-wx">
+          <span class="w-icon">${day.wx.icon}</span>
+          <span class="w-temp">${day.wx.lo}–${day.wx.hi}°C</span>
+          <span class="day-chev" id="chev-${day.day}">▼</span>
+        </div>
+      </div>
+      <div class="day-body" id="body-${day.day}" style="display:none">
+        <div class="wx-detail">🌡️ ${day.wx.desc}</div>
+        ${day.hotel&&day.hotel.cost>0?`<div class="hotel-info"><span>🏨 ${day.hotel.name}</span><span class="hotel-cost">${fA(day.hotel.cost,day.hotel.cur)} <span class="hst ${day.hotel.st==='Done'?'paid':day.hotel.st==='To-do'?'todo':'unpaid'}">${day.hotel.st}</span></span></div>`:''}
+        <div class="events-list">
+          ${day.events.map((ev,i)=>`
+            <div class="event-item">
+              <div class="event-time">${ev.time}</div>
+              <div class="event-content">
+                <div class="event-name">${ev.emoji} ${ev.name}</div>
+                <div class="event-desc">${ev.desc}</div>
+                <div class="event-maps">
+                  <a href="https://www.google.com/maps/search/?api=1&query=${ev.lat},${ev.lng}" target="_blank" class="map-link gmap">🗺️ Google Maps</a>
+                  <a href="mapsme://map?v=1&ll=${ev.lat},${ev.lng}&n=${encodeURIComponent(ev.name)}&z=15" class="map-link mme">📍 Maps.me</a>
+                </div>
+                <div id="ph-${day.day}-${i}"><span class="ph-loading">⏳ กำลังโหลดรูป...</span></div>
+              </div>
+            </div>`).join('')}
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+const phCache={};
+function togDay(n){
+  const b=document.getElementById('body-'+n),ch=document.getElementById('chev-'+n);if(!b)return;
+  const open=b.style.display!=='none';
+  b.style.display=open?'none':'block';ch.textContent=open?'▼':'▲';
+  if(!open){const day=ITIN.find(d=>d.day===n);if(day)day.events.forEach((ev,i)=>ldPh(n,i,ev.cc));}
+}
+async function ldPh(dn,ei,cats){
+  const cid=`ph-${dn}-${ei}`,ctr=document.getElementById(cid);if(!ctr)return;
+  const key=cats.join(',');
+  if(phCache[key]){shPh(ctr,phCache[key]);return;}
+  const photos=[];
+  for(const cat of cats.slice(0,2)){
+    try{
+      const url=`https://commons.wikimedia.org/w/api.php?action=query&generator=categorymembers&gcmtitle=Category:${encodeURIComponent(cat)}&gcmtype=file&prop=imageinfo&iiprop=url&iiurlwidth=600&format=json&origin=*&gcmlimit=4`;
+      const res=await fetch(url),data=await res.json();
+      if(data.query&&data.query.pages){Object.values(data.query.pages).forEach(p=>{if(p.imageinfo&&p.imageinfo[0]&&p.imageinfo[0].thumburl){const u=p.imageinfo[0].thumburl;if(!u.toLowerCase().includes('.svg'))photos.push(u);}});}
+    }catch(e){}
+    if(photos.length>=4)break;
+  }
+  if(!photos.length){try{const res=await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(cats[0].replace(/_/g,' '))}`);const d=await res.json();if(d.thumbnail&&d.thumbnail.source)photos.push(d.thumbnail.source);}catch(e){}}
+  if(!photos.length)photos.push(`https://picsum.photos/seed/${cats[0].replace(/\s+/g,'-')}/600/400`);
+  phCache[key]=photos;
+  const c2=document.getElementById(cid);if(c2)shPh(c2,photos);
+}
+function shPh(ctr,photos){ctr.innerHTML=`<div class="photo-scroll">${photos.slice(0,4).map(u=>`<img src="${u}" class="ev-photo" onclick="opPh('${u.replace(/'/g,"\\'")}')\" onerror="this.style.display='none'">`).join('')}</div>`;}
+function opPh(url){showM(`<div class="photo-fs" onclick="closeM()"><img src="${url}" style="max-width:100%;max-height:75vh;object-fit:contain;border-radius:10px"><p style="color:var(--text3);margin-top:10px;font-size:12px">แตะเพื่อปิด</p></div>`);}
+
+// ================================================================
+// EXPENSES
+// ================================================================
+function renderExp(){
+  const sub=document.getElementById('exp-sub');if(sub)sub.textContent=`${STATE.expenses.length} รายการ`;
+  const exps=STATE.expenses.slice().reverse();
+  document.getElementById('exp-cnt').innerHTML=exps.length?exps.map(e=>{
+    const pay=gM(e.paidBy),cat=gC(e.category),thb=toTHB(e.amount,e.currency);
+    return `<div class="expense-item" onclick="openExpModal('${e.id}')">
+      <div class="exp-icon">${cat.emoji}</div>
+      <div class="exp-info">
+        <div class="exp-name">${e.name}</div>
+        <div class="exp-meta"><span class="exp-date">${e.date}</span><span class="exp-payer" style="color:${pay?pay.color:'#888'}">${pay?(pay.photo?'':pay.emoji+' ')+pay.name:'?'}</span></div>
+        <div class="exp-splits">หาร ${e.splits.length} คน</div>
+      </div>
+      <div class="exp-amount"><div class="exp-orig">${fA(e.amount,e.currency)}</div><div class="exp-thb">${fB(thb)}</div></div>
+    </div>`;
+  }).join(''):`<div class="empty-st">ยังไม่มีรายการ<br>กด <strong>+</strong> เพิ่มค่าใช้จ่าย</div>`;
+}
+
+function openExpModal(id){
+  if(!STATE.members.length){toast('กรุณาเพิ่มสมาชิกก่อน');return;}
+  const e=id?STATE.expenses.find(x=>x.id===id):null;
+  const today=new Date().toISOString().slice(0,10);
+  const catH=CATS.map(c=>`<span class="cat-chip ${e&&e.category===c.id?'sel':''}" data-cat="${c.id}" onclick="sCat(this)">${c.emoji} ${c.label}</span>`).join('');
+  const payH=STATE.members.map(m=>`<option value="${m.id}" ${e&&e.paidBy===m.id?'selected':''}>${m.emoji} ${m.name}</option>`).join('');
+  const curH=CURS.map(c=>`<option value="${c}" ${e&&e.currency===c?'selected':''}>${c}</option>`).join('');
+  const spH=STATE.members.map(m=>`<label class="splt-chk"><input type="checkbox" name="sp" value="${m.id}" ${!e||e.splits.find(s=>s.memberId===m.id)?'checked':''}><span class="chk-av" style="background:${m.color}30;border:1px solid ${m.color}">${m.photo?`<img src="${m.photo}" style="width:24px;height:24px;object-fit:cover;border-radius:50%">`:m.emoji}</span>${m.name}</label>`).join('');
+  showM(`<div class="mhdr"><h3>${e?'แก้ไข':'เพิ่ม'}ค่าใช้จ่าย</h3></div>
+    <div class="mbdy">
+      <label>หมวดหมู่</label><div class="cat-chips">${catH}</div>
+      <label>ชื่อรายการ</label><input type="text" id="en" placeholder="เช่น อาหารเย็น, น้ำมัน" value="${e?e.name.replace(/"/g,'&quot;'):''}">
+      <label>วันที่</label><input type="date" id="ed" value="${e?e.date:today}">
+      <div class="amt-row"><div class="amt-f"><label>จำนวนเงิน</label><input type="number" id="ea" placeholder="0" value="${e?e.amount:''}"></div><div class="cur-f"><label>สกุลเงิน</label><select id="ec">${curH}</select></div></div>
+      <label>จ่ายโดย</label><select id="ep">${payH}</select>
+      <label>หารกัน</label>
+      <div class="splt-list"><button type="button" class="sel-all-btn" onclick="togAll()">เลือก/ยกเลิกทั้งหมด</button>${spH}</div>
+    </div>
+    <div class="mftr">
+      ${e?`<button class="btn-del" onclick="delExp('${id}')">ลบ</button>`:'<span></span>'}
+      <div style="display:flex;gap:8px"><button class="btn-cancel" onclick="closeM()">ยกเลิก</button><button class="btn-save" onclick="saveExp('${id||''}')">บันทึก</button></div>
+    </div>`);
+}
+function sCat(el){document.querySelectorAll('.cat-chip').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');}
+function togAll(){const cks=document.querySelectorAll('input[name="sp"]');const all=Array.from(cks).every(c=>c.checked);cks.forEach(c=>c.checked=!all);}
+function saveExp(id){
+  const name=document.getElementById('en').value.trim(),date=document.getElementById('ed').value;
+  const amount=parseFloat(document.getElementById('ea').value),currency=document.getElementById('ec').value;
+  const paidBy=document.getElementById('ep').value;
+  const catEl=document.querySelector('.cat-chip.sel');const category=catEl?catEl.dataset.cat:'other';
+  const splits=Array.from(document.querySelectorAll('input[name="sp"]:checked')).map(c=>({memberId:c.value}));
+  if(!name){toast('กรุณากรอกชื่อรายการ');return;}
+  if(!amount||amount<=0){toast('กรุณากรอกจำนวนเงิน');return;}
+  if(!splits.length){toast('เลือกอย่างน้อย 1 คน');return;}
+  if(id){const e=STATE.expenses.find(x=>x.id===id);if(e)Object.assign(e,{name,date,amount,currency,paidBy,category,splits});}
+  else STATE.expenses.push({id:uid(),name,date,amount,currency,paidBy,category,splits});
+  save();closeM();renderExp();
+}
+function delExp(id){if(!confirm('ลบรายการนี้?'))return;STATE.expenses=STATE.expenses.filter(e=>e.id!==id);save();closeM();renderExp();}
+
+// ================================================================
+// SUMMARY
+// ================================================================
+function renderSum(){
+  const members=STATE.members,expenses=STATE.expenses;
+  let gt=0;const paid={},owed={};
+  members.forEach(m=>{paid[m.id]=0;owed[m.id]=0;});
+  expenses.forEach(e=>{
+    const thb=toTHB(e.amount,e.currency);gt+=thb;
+    if(paid[e.paidBy]!==undefined)paid[e.paidBy]+=thb;
+    const sh=e.splits.length>0?thb/e.splits.length:0;
+    e.splits.forEach(s=>{if(owed[s.memberId]!==undefined)owed[s.memberId]+=sh;});
+  });
+  const bal={};members.forEach(m=>{bal[m.id]=paid[m.id]-owed[m.id];});
+  const pos=[],neg=[];
+  members.forEach(m=>{const b=bal[m.id];if(b>1)pos.push({id:m.id,val:b});else if(b<-1)neg.push({id:m.id,val:-b});});
+  pos.sort((a,b)=>b.val-a.val);neg.sort((a,b)=>b.val-a.val);
+  const txns=[];
+  while(pos.length&&neg.length){const p=pos[0],n=neg[0],a=Math.min(p.val,n.val);txns.push({from:n.id,to:p.id,amount:a});p.val-=a;n.val-=a;if(p.val<1)pos.shift();if(n.val<1)neg.shift();}
+
+  const mH=members.map(m=>{const b=bal[m.id],ip=b>=0;return`<div class="mscard" style="border-left:4px solid ${m.color}"><div class="ms-av" style="background:${m.color}30">${m.photo?`<img src="${m.photo}" style="width:36px;height:36px;object-fit:cover;border-radius:50%">`:`<span>${m.emoji}</span>`}</div><div class="ms-inf"><div class="ms-name">${m.name}</div><div class="ms-det">จ่าย ${fB(paid[m.id])} · ส่วนแบ่ง ${fB(owed[m.id])}</div></div><div class="ms-bal ${ip?'pos':'neg'}">${ip?'+':''}${fB(b)}</div></div>`;}).join('');
+  const tH=txns.length?txns.map(t=>{const f=gM(t.from),o=gM(t.to);return`<div class="tx-item"><div class="tx-from" style="color:${f?f.color:'#888'}">${f?(f.photo?'':f.emoji+' ')+f.name:'?'}</div><div class="tx-arr">→ ${fB(t.amount)} →</div><div class="tx-to" style="color:${o?o.color:'#888'}">${o?(o.photo?'':o.emoji+' ')+o.name:'?'}</div></div>`;}).join(''):`<div class="empty-st">ไม่มีรายการ หรือทุกคนยอดเท่ากัน 🎉</div>`;
+  const ct={};CATS.forEach(c=>ct[c.id]=0);expenses.forEach(e=>{ct[e.category]=(ct[e.category]||0)+toTHB(e.amount,e.currency);});
+  const tc=CATS.filter(c=>ct[c.id]>0).sort((a,b)=>ct[b.id]-ct[a.id]);
+  const mx=tc.length?ct[tc[0].id]:1;
+  const catH=tc.map(c=>`<div class="cat-bar"><div class="cat-bar-lbl">${c.emoji} ${c.label}</div><div class="cat-bar-wrap"><div class="cat-bar-fill" style="width:${(ct[c.id]/mx*100).toFixed(0)}%"></div></div><div class="cat-bar-amt">${fB(ct[c.id])}</div></div>`).join('');
+
+  document.getElementById('sum-cnt').innerHTML=`
+    <div class="sum-hero"><div class="tot-lbl">รวมค่าใช้จ่ายทั้งหมด</div><div class="tot-val">${fB(gt)}</div><div class="tot-sub">เฉลี่ย ${fB(members.length?gt/members.length:0)}/คน</div></div>
+    <div class="section"><div class="sec-header"><h2>💳 ยอดแต่ละคน</h2></div>${mH||'<p class="empty-txt">ยังไม่มีสมาชิก</p>'}</div>
+    <div class="section" style="padding-top:0"><div class="sec-header"><h2>🔄 Settlement</h2></div>${tH}</div>
+    ${tc.length?`<div class="section" style="padding-top:0"><div class="sec-header"><h2>📊 หมวดหมู่</h2></div>${catH}</div>`:''}`;
+}
+
+// ================================================================
+// MODAL & TOAST
+// ================================================================
+function showM(html){const ov=document.getElementById('modal-ov'),bx=document.getElementById('modal-box');bx.innerHTML=html;bx.scrollTop=0;ov.style.display='flex';}
+function closeM(){document.getElementById('modal-ov').style.display='none';}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+
+// ================================================================
+// INIT
+// ================================================================
+function init(){
+  loadState();
+
+  // Init Firebase if config saved
+  const fbCfg=loadFbConfig();
+  if(fbCfg)initFirebase(fbCfg);
+
+  // Setup onboarding UI
+  setupOnboarding();
+
+  // Check if user has already joined
+  const myId=localStorage.getItem('kzkg_myId');
+  const stillMember=myId&&STATE.members.find(m=>m.id===myId);
+  if(!myId||!stillMember){
+    document.getElementById('onboarding-ov').style.display='flex';
+  } else {
+    document.getElementById('onboarding-ov').style.display='none';
+    goTo('home');
+  }
+
+  document.getElementById('modal-ov').addEventListener('click',e=>{if(e.target.id==='modal-ov')closeM();});
+  document.getElementById('fb-setup-ov').addEventListener('click',e=>{if(e.target.id==='fb-setup-ov')closeFbSetup();});
+}
+document.addEventListener('DOMContentLoaded',init);
+</script>
+</body>
+</html>
